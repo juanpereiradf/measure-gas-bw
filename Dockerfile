@@ -1,20 +1,15 @@
-# Usar una imagen oficial de Python ligera
 FROM python:3.11-slim
 
-# Evitar que Python genere archivos .pyc y permitir logs en tiempo real
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Establecer el directorio de trabajo
 WORKDIR /app
 
-# Instalar dependencias
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar el resto del código
 COPY . .
 
-# Cloud Run pasa el puerto en la variable de entorno $PORT (default 8080)
-# FastAPI con uvicorn necesita escuchar en 0.0.0.0
-CMD uvicorn main:app --host 0.0.0.0 --port 8080
+# Usar gunicorn con trabajadores de uvicorn es lo recomendado para producción en Cloud Run
+# Esto bindea automáticamente al puerto definido en la variable de entorno $PORT
+CMD exec gunicorn --bind :$PORT --workers 1 --worker-class uvicorn.workers.UvicornWorker  --threads 8 main:app
