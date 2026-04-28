@@ -1,0 +1,38 @@
+name: Deploy DEV
+
+on:
+  push:
+    branches: [develop]
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  SERVICE_NAME: measure-gas-bw-dev
+  REGION: us-central1
+
+jobs:
+  deploy:
+    name: Build & Deploy to Cloud Run (DEV)
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Autenticación en Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          project_id: 'gen-lang-client-0114039589'
+          workload_identity_provider: 'projects/989729087998/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'github-deployer-sa@gen-lang-client-0114039589.iam.gserviceaccount.com'
+
+      - name: Desplegar a Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ env.SERVICE_NAME }}
+          region: ${{ env.REGION }}
+          source: '.'
+          flags: '--allow-unauthenticated --service-account=app-runner-sa@gen-lang-client-0114039589.iam.gserviceaccount.com --set-env-vars ENV=dev,API_KEY=${{ secrets.DEV_API_KEY }},JWT_SECRET=${{ secrets.DEV_JWT_SECRET }},AIRTABLE_API_KEY=${{ secrets.DEV_AIRTABLE_API_KEY }},AIRTABLE_BASE_ID=${{ secrets.DEV_AIRTABLE_BASE_ID }},AIRTABLE_TABLE_NAME=tblI5hgRqusP8ddjZ'
