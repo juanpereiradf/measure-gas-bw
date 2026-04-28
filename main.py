@@ -42,13 +42,29 @@ def test_bandwidth(multiplier: int = 1):
     # Generamos la lista proporcional. Ajusta x10 para que 1 multiplier = ~15 KB
     data = [base_item for _ in range(multiplier * 10)]
     
-    # Calculamos el tamaño exacto generado
-    payload_str = json.dumps(data)
-    size_in_bytes = len(payload_str.encode('utf-8'))
-    size_in_kb = round(size_in_bytes / 1024.0, 2)
+    # Calculamos el tamaño exacto del cuerpo de la respuesta (string JSON)
+    payload_str = json.dumps({
+        "multiplier": multiplier,
+        "data": data
+    })
+    
+    # El tamaño en bytes depende de la codificación (UTF-8 es el estándar)
+    exact_size_bytes = len(payload_str.encode('utf-8'))
+    exact_size_kb = exact_size_bytes / 1024.0
+    
+    # Nota sobre las complicaciones al estimar el tamaño:
+    # 1. Encoding: UTF-8 usa de 1 a 4 bytes por caracter.
+    # 2. Compresión: Gzip/Brotli pueden reducir el tamaño en red significativamente.
+    # 3. Overhead HTTP: Headers añaden unos cientos de bytes extra.
+    # 4. Parsing: En Apps Script, el objeto JSON en memoria ocupará más que el string bruto.
     
     return {
-        "length": f"{size_in_kb} KB",
-        "multiplier": multiplier,
+        "metadata": {
+            "multiplier": multiplier,
+            "exact_size_bytes": exact_size_bytes,
+            "exact_size_kb": round(exact_size_kb, 4),
+            "encoding": "utf-8",
+            "note": "Este tamaño corresponde únicamente al body (JSON). El tráfico total de red incluirá headers HTTP."
+        },
         "data": data
     }
