@@ -126,7 +126,7 @@ jobs:
           service: \${{ env.SERVICE_NAME }}
           region: \${{ env.REGION }}
           source: '.'
-          flags: '--allow-unauthenticated --service-account=app-runner-sa@$PROJECT_ID.iam.gserviceaccount.com --set-env-vars ENV=dev,API_KEY=\${{ secrets.DEV_API_KEY }},JWT_SECRET=\${{ secrets.DEV_JWT_SECRET }},AIRTABLE_API_KEY=\${{ secrets.DEV_AIRTABLE_API_KEY }},AIRTABLE_BASE_ID=\${{ secrets.DEV_AIRTABLE_BASE_ID }},AIRTABLE_TABLE_NAME=tblI5hgRqusP8ddjZ'
+          flags: '--allow-unauthenticated --clear-base-image --service-account=app-runner-sa@$PROJECT_ID.iam.gserviceaccount.com --set-env-vars ENV=dev,API_KEY=\${{ secrets.DEV_API_KEY }},JWT_SECRET=\${{ secrets.DEV_JWT_SECRET }},AIRTABLE_API_KEY=\${{ secrets.DEV_AIRTABLE_API_KEY }},AIRTABLE_BASE_ID=\${{ secrets.DEV_AIRTABLE_BASE_ID }},AIRTABLE_TABLE_NAME=tblI5hgRqusP8ddjZ'
 EOF
 
 echo "✅ Proceso completado exitosamente."
